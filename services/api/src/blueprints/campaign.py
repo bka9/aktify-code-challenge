@@ -7,19 +7,19 @@ from flask import request
 campaign_blueprint = Blueprint('campaigns', __name__, url_prefix='/campaigns')
 
 
-@campaign_blueprint.route('/', methods=['GET', 'POST'])
+@campaign_blueprint.route('/', methods=['GET'])
 def index():
-    if request.method == 'GET':
-        campaigns = Campaign.query.all()
+    campaigns = Campaign.query.all()
+    return jsonify([campaign.serialize for campaign in campaigns])
 
-        return jsonify([campaign.serialize for campaign in campaigns])
-    else:
-        data = request.get_json()
-        campaign = Campaign(name = data['name'])
-        db.session.add(campaign)
-        db.session.commit()
-        db.session.refresh(campaign)
-        return jsonify(campaign.serialize)
+@campaign_blueprint.route('/', methods=['POST'])
+def create():
+    data = request.get_json()
+    campaign = Campaign(name = data['name'])
+    db.session.add(campaign)
+    db.session.commit()
+    db.session.refresh(campaign)
+    return jsonify(campaign.serialize)
 
 @campaign_blueprint.route('/<campaign_id>', methods=['GET'])
 def get(campaign_id):
