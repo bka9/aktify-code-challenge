@@ -1,6 +1,8 @@
 import {useQuery} from '@apollo/client';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
 import gql from 'graphql-tag';
 import React from 'react';
 import CampaignList from '../../components/CampaignList';
@@ -36,8 +38,15 @@ const CampaignsView = () => {
 
     return (
         <Grid container>
-            <Grid container>
+            <Grid container justify='space-between'>
+              <Grid item>
                 <Title>Campaigns View</Title>
+              </Grid>
+              <Grid item>
+                <IconButton aria-label="add">
+                  <AddIcon />
+                </IconButton>
+              </Grid>
             </Grid>
 
             <Grid container>
