@@ -1,16 +1,25 @@
 from flask import Blueprint
 from flask.json import jsonify
 from src.models import Campaign
+from src.models import db
+from flask import request
 
-campaign_blueprint = Blueprint('campaign', __name__, url_prefix='/campaigns')
+campaign_blueprint = Blueprint('campaigns', __name__, url_prefix='/campaigns')
 
 
-@campaign_blueprint.route('/', methods=['GET'])
+@campaign_blueprint.route('/', methods=['GET', 'POST'])
 def index():
-    campaigns = Campaign.query.all()
+    if request.method == 'GET':
+        campaigns = Campaign.query.all()
 
-    return jsonify([campaign.serialize for campaign in campaigns])
-
+        return jsonify([campaign.serialize for campaign in campaigns])
+    else:
+        data = request.get_json()
+        campaign = Campaign(name = data['name'])
+        db.session.add(campaign)
+        db.session.commit()
+        db.session.refresh(campaign)
+        return jsonify(campaign.serialize)
 
 @campaign_blueprint.route('/<campaign_id>', methods=['GET'])
 def get(campaign_id):

@@ -1,4 +1,4 @@
-import {useQuery} from '@apollo/client';
+import {useQuery, useMutation} from '@apollo/client';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
@@ -23,12 +23,40 @@ const GET_CAMPAIGNS = gql`
     }
 `;
 
-const CampaignsView = () => {
+const SAVE_CAMPAIGN = gql`
+  mutation PostCampaign{
+    campaign(input: $input) @rest(type: "[Campaign]", method: "POST",  path: "/campaigns/") {
+      id
+      name
+      createdOn
+      updatedOn
+    }
+  }
+`;
+
+const CampaignsView = (props) => {
     useViewTitle('Campaigns');
 
     const [isOpen, setIsOpen] = useState(false)
     const [campaign, setCampaign] = useState({})
     const {loading, error, data} = useQuery(GET_CAMPAIGNS);
+    const [saveCampaign] = useMutation(SAVE_CAMPAIGN, {
+      onCompleted({campaign: newCampaign}){
+        setCampaign({})
+        setIsOpen(false)
+        props.history.push(`/campaigns/${newCampaign.id}`)
+      },
+      onError(e){
+        console.log(e)
+      },
+      update(cache, {data: {campaign: newCampaign}}) {
+        const { campaigns } = cache.readQuery({ query: GET_CAMPAIGNS });
+        cache.writeQuery({
+          query: GET_CAMPAIGNS,
+          data: { campaigns: campaigns.concat([newCampaign]) },
+        });
+      }
+      });
 
     if (loading) {
         return <span>Loading...</span>;
@@ -48,10 +76,7 @@ const CampaignsView = () => {
       setIsOpen(false)
     }
     const handleDialogSave = () => {
-      console.log("Saving")
-      console.log(campaign)
-      setCampaign({})
-      setIsOpen(false)
+      saveCampaign({ variables: { input: campaign }})
     }
     const handleCampaignChange = (v) => {
       setCampaign(v)
