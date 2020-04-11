@@ -28,6 +28,7 @@ import {routeFnFactory} from './utils/routeUtils';
 
 const routes = {
     campaignList: '/campaigns',
+    campainAdd: '/campaigns/add',
     campaignDetails: routeFnFactory('/campaigns/:id'),
     dashboard: '/',
 };
