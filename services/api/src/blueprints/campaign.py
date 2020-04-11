@@ -15,7 +15,7 @@ def index():
 @campaign_blueprint.route('/', methods=['POST'])
 def create():
     data = request.get_json()
-    campaign = Campaign(name = data['name'])
+    campaign = Campaign(name = data['name'], description = data.get('description'), is_active = data.get('is_active'))
     db.session.add(campaign)
     db.session.commit()
     db.session.refresh(campaign)
